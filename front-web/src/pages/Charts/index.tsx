@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { barOptions, pieOptions } from './chart-options';
-import Chart from 'react-apexcharts';
-import axios from 'axios';
-import { buildBarSeries, getPlatformChartData, getGenderChartData } from './helpers';
+import Axios from 'axios';
 
+import Chart from 'react-apexcharts';
+
+import { buildBarSeries, getGenderChartData, getPlatformChartData } from './helpers';
 import Filters from '../../components/Filters';
+import { barOptions, pieOptions } from './chart-options';
 
 import './styles.css';
+
+
 
 type PieChartData = {
     labels: string[];
@@ -32,23 +35,24 @@ const Charts = () => {
 
     useEffect(() => {
         async function getData() {
-            const recordsResponse = await axios.get(`${BASE_URL}/records`);
-            const gamesResponse = await axios.get(`${BASE_URL}/games`);
+            const recordsResponse = await Axios.get(`${BASE_URL}/records`);
+            const gamesResponse = await Axios.get(`${BASE_URL}/games`);
 
             const barData = buildBarSeries(gamesResponse.data, recordsResponse.data.content);
+            console.log(gamesResponse.data)
             setBarChartData(barData);
+
+            console.log(gamesResponse.data)
 
             const platformChartData = getPlatformChartData(recordsResponse.data.content);
             setPlatformData(platformChartData);
 
             const genderChartData = getGenderChartData(recordsResponse.data.content);
             setGenderData(genderChartData);
-
-
         }
 
         getData();
-    }, [])
+    }, []);
 
     return (
         <div className="page-container">
@@ -62,8 +66,8 @@ const Charts = () => {
                         <Chart
                             options={barOptions}
                             type="bar"
-                            width="900"
-                            height="150"
+                            width="600"
+                            height="auto"
                             series={[{ data: barChartData }]}
                         />
                     </div>
@@ -73,24 +77,24 @@ const Charts = () => {
                         <h2 className="chart-title">Plataformas</h2>
                         <Chart
                             options={{ ...pieOptions, labels: platformData?.labels }}
-                            type="donut"
+                            type='donut'
                             series={platformData?.series}
-                            width="350"
+                            width='350'
                         />
                     </div>
                     <div className="gender-chart">
                         <h2 className="chart-title">Gêneros</h2>
                         <Chart
                             options={{ ...pieOptions, labels: genderData?.labels }}
-                            type="donut"
+                            type='donut'
                             series={genderData?.series}
-                            width="350"
+                            width='350'
                         />
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default Charts;
